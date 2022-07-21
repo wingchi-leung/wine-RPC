@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/qrpc/qRPC-common/qRPC-common.iml" filepath="$PROJECT_DIR$/qrpc/qRPC-common/qRPC-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/qrpc/qRPC-server/qRPC-server.iml" filepath="$PROJECT_DIR$/qrpc/qRPC-server/qRPC-server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/qrpc/qRpc-client/qRpc-client.iml" filepath="$PROJECT_DIR$/qrpc/qRpc-client/qRpc-client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/qrpc/qRpc-example-server/qRpc-example-server.iml" filepath="$PROJECT_DIR$/qrpc/qRpc-example-server/qRpc-example-server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/qrpc/qrpc.iml" filepath="$PROJECT_DIR$/qrpc/qrpc.iml" />
+    </modules>
+  </component>
+</project>
