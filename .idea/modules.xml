@@ -5,6 +5,9 @@
       <module fileurl="file://$PROJECT_DIR$/qrpc/qRPC-common/qRPC-common.iml" filepath="$PROJECT_DIR$/qrpc/qRPC-common/qRPC-common.iml" />
       <module fileurl="file://$PROJECT_DIR$/qrpc/qRPC-server/qRPC-server.iml" filepath="$PROJECT_DIR$/qrpc/qRPC-server/qRPC-server.iml" />
       <module fileurl="file://$PROJECT_DIR$/qrpc/qRpc-client/qRpc-client.iml" filepath="$PROJECT_DIR$/qrpc/qRpc-client/qRpc-client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/qrpc/qRpc-common-api/qRpc-common-api.iml" filepath="$PROJECT_DIR$/qrpc/qRpc-common-api/qRpc-common-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/qrpc/qRpc-core/qRpc-core.iml" filepath="$PROJECT_DIR$/qrpc/qRpc-core/qRpc-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/qrpc/qRpc-example-client/qRpc-example-client.iml" filepath="$PROJECT_DIR$/qrpc/qRpc-example-client/qRpc-example-client.iml" />
       <module fileurl="file://$PROJECT_DIR$/qrpc/qRpc-example-server/qRpc-example-server.iml" filepath="$PROJECT_DIR$/qrpc/qRpc-example-server/qRpc-example-server.iml" />
       <module fileurl="file://$PROJECT_DIR$/qrpc/qrpc.iml" filepath="$PROJECT_DIR$/qrpc/qrpc.iml" />
     </modules>

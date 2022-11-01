@@ -1,8 +1,8 @@
-package demo.rpc.example.service.impl;
+package demo.rpc.example.serviceImpl;
 
 
 import demo.rpc.common.annotation.RpcService;
-import demo.rpc.example.service.CalculatorService;
+import service.CalculatorService;
 
 @RpcService(value = CalculatorService.class,version = "1.0")
 public class CalculatorServiceImpl implements CalculatorService {
@@ -11,4 +11,16 @@ public class CalculatorServiceImpl implements CalculatorService {
     public int add(int a, int b) {
         return a+b;
     }
+
+    @Override
+    public int multiply(int a, int b) {
+        return a*b;
+    }
+
+    @Override
+    public int divide(int a, int b) {
+        return a/b;
+    }
+
+
 }

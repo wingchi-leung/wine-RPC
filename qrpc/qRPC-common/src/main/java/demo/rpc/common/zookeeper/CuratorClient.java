@@ -1,19 +1,19 @@
 package demo.rpc.common.zookeeper;
 
-import demo.rpc.common.registry.RegistryConstant;
+import demo.rpc.common.constant.RegistryConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
-import org.apache.curator.framework.recipes.cache.PathChildrenCache;
-import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
-import org.apache.curator.framework.recipes.cache.TreeCache;
-import org.apache.curator.framework.recipes.cache.TreeCacheListener;
-import org.apache.curator.framework.state.ConnectionStateListener;
+import org.apache.curator.framework.recipes.cache.CuratorCache;
+import org.apache.curator.framework.recipes.cache.CuratorCacheListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
 
 import java.util.List;
+
+import static demo.rpc.common.constant.RegistryConstant.ROOT_PATH;
+
 @Slf4j
 public class CuratorClient {
     private CuratorFramework client;
@@ -69,9 +69,17 @@ public class CuratorClient {
         return createNodeWithMode(path, data, CreateMode.PERSISTENT);
     }
 
+    public void addListener(String path, CuratorCacheListener listener){
+        String fullPath = buildPath(path);
+        CuratorCache curatorCache = CuratorCache.build(client,fullPath) ;
+        curatorCache.listenable().addListener(listener) ;
+        curatorCache.start();
+    }
 
-    public void addConnectionStateListener(ConnectionStateListener connectionStateListener) {
-        client.getConnectionStateListenable().addListener(connectionStateListener);
+    private String buildPath(String path) {
+        if(path.startsWith(ROOT_PATH)) return path ;
+        if(path.startsWith("/")) return ROOT_PATH + path ;
+        return ROOT_PATH+"/"+path;
     }
 
 
@@ -79,29 +87,15 @@ public class CuratorClient {
         return client.getData().forPath(path);
     }
 
-    public void updatePathData(String path, byte[] data) throws Exception {
-        client.setData().forPath(path, data);
-    }
 
     public void deletePath(String path) throws Exception {
         client.delete().forPath(path);
     }
 
     public List<String> getChildren(String path) throws  Exception{
-
         return client.getChildren().forPath(path);
     }
 
-    public void watchTreeNode(String path, TreeCacheListener listener){
-        TreeCache treeCache =new TreeCache(client,path) ;
-        treeCache.getListenable().addListener(listener);
-    }
-
-    public void watchPathChildrenNode(String path, PathChildrenCacheListener listener) throws Exception {
-        PathChildrenCache pathChildrenCache =new PathChildrenCache(client,path,true) ;
-        pathChildrenCache.start(PathChildrenCache.StartMode.BUILD_INITIAL_CACHE) ;
-        pathChildrenCache.getListenable().addListener(listener);
-    }
 
     public void close(){
         client.close();

@@ -1,4 +1,4 @@
-package netty;
+package demo.rpc.client.netty;
 
 import cn.hutool.core.util.StrUtil;
 import demo.rpc.common.netty.RpcMessageDecoder;
@@ -77,12 +77,13 @@ public class NettyClient {
                 if (future.isSuccess()) {
                     completableFuture.complete(future.channel());
                 } else {
-                    throw new IllegalArgumentException(StrUtil.format("connect fail,address :", address));
+                    throw new RuntimeException("connect fail.... address="+address);
                 }
             });
             return completableFuture.get(10, TimeUnit.SECONDS);
         } catch (Exception e) {
-            throw new RuntimeException("connect fail" + address + " message :" + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("connect fail" + address + " message :" + e.getCause());
         }
     }
 }

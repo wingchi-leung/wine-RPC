@@ -9,6 +9,7 @@ import io.protostuff.runtime.RuntimeSchema;
 //TODO  schma cache? https://meua.github.io/2018/05/02/%E5%88%9D%E6%8E%A2Protostuff%E7%9A%84%E4%BD%BF%E7%94%A8/
 
 public class ProtoStuffSerializer implements Serializer {
+    //避免每次序列化都要重新申请Buffer空间
     private static final LinkedBuffer BUFFER = LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE);
 
     @Override

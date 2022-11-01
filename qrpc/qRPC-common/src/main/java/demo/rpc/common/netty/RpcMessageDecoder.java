@@ -8,6 +8,7 @@ import demo.rpc.common.protocol.RpcMessage;
 import demo.rpc.common.protocol.RpcRequest;
 import demo.rpc.common.protocol.RpcResponse;
 import demo.rpc.common.serialize.Serializer;
+import demo.rpc.common.serialize.protostuff.ProtoStuffSerializer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
@@ -101,7 +102,8 @@ public class RpcMessageDecoder extends LengthFieldBasedFrameDecoder {
         // NOTE 先解压再序列化， 因为encode的时候就没有压缩，所以这里省略了。
 
         ServiceLoader<Serializer> serializers = ServiceLoader.load(Serializer.class);
-        Serializer serializer = serializers.iterator().next();
+//        Serializer serializer = serializers.iterator().next();
+        Serializer serializer =new ProtoStuffSerializer();
         //根据消息类型获得class信息。
         Class<?> clazz = message == MessageType.REQUEST.getValue()? RpcRequest.class : RpcResponse.class;
         Object o = serializer.deSerialize(data, clazz);

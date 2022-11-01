@@ -1,4 +1,4 @@
-package netty;
+package demo.rpc.client.netty;
 
 import demo.rpc.common.constant.CompressType;
 import demo.rpc.common.constant.MessageType;
@@ -9,7 +9,6 @@ import io.netty.channel.*;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.ReferenceCountUtil;
-import io.netty.util.concurrent.EventExecutorGroup;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -20,7 +19,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<RpcMessage> 
             log.info("client receive msg : [{}]",msg);
             if (msg.getMessageType()== MessageType.RESPONSE.getValue()){
                 RpcResponse<?> rpcResponse = (RpcResponse<?>) msg.getData();
-                // LEARN
+                //本地缓存的消息表
                 UnProcessMessage.complete(rpcResponse);
             }
         }finally {
@@ -39,7 +38,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<RpcMessage> 
                 rpcMessage.setSerializeType(SerializeType.PROTOSTUFF.getValue());
                 rpcMessage.setMessageType(MessageType.HEARTBEAT.getValue());
                 rpcMessage.setCompressorType(CompressType.DUMMY.getValue());
-                //LEARN
+                //失败则关闭
                 channel.writeAndFlush(rpcMessage).addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
             }else{
                 super.userEventTriggered(ctx,evt);

@@ -1,5 +1,13 @@
 package demo.rpc.common.registry;
 
+import java.util.List;
+
 public interface Discovery {
-    void discover(String serviceName) ;
+    List<URL> discover(URL url);
+
+    List<URL> reset(URL url);
+
+    void addToLocalCache(URL url) ;
+
+    void removeFromLocalCache(URL url) ;
 }

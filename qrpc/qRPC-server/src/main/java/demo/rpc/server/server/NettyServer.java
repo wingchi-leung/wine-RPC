@@ -5,6 +5,7 @@ import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.RuntimeUtil;
 import demo.rpc.common.netty.RpcMessageDecoder;
 import demo.rpc.common.netty.RpcMessageEncoder;
+import demo.rpc.common.registry.Registry;
 import demo.rpc.common.registry.URL;
 import demo.rpc.common.util.ServiceUtil;
 import demo.rpc.server.nettyHandler.RpcServerHandler;
@@ -15,6 +16,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.concurrent.DefaultEventExecutorGroup;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -24,30 +26,44 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import demo.rpc.server.registry.zkRegistry;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 
 @Slf4j
 public class NettyServer implements Server {
 
-    private Thread thread;
     private String serverAddr;
+    private int serverPort;
     private zkRegistry zkRegistry;
-    private Map<String, Object> serviceMap = new HashMap<>();
-    private List<URL> UrlLists = new ArrayList<>() ;
+    private List<URL> UrlLists = new ArrayList<>();
+
     public NettyServer(String serverAddr, String registryAddr) {
+        log.info("registry address: {}", registryAddr);
+        log.info("server address: {}", serverAddr);
         this.serverAddr = serverAddr;
         zkRegistry = new zkRegistry(registryAddr);
     }
 
+    public NettyServer(){
+
+    }
+
+    public void setZkRegistry(String serverAddr, int serverPort, String registryString) {
+        log.info("registry address: {}", registryString);
+        log.info("server address: {}", serverAddr);
+        this.serverAddr = serverAddr;
+        this.serverPort=serverPort;
+        zkRegistry = new zkRegistry(registryString);
+    }
 
     protected void addService(String interfaceName, String version) {
         log.info("add demo.rpc.service,interface:{} ,version:{}", interfaceName, version);
-        URL url = URL.buildServiceUrl(interfaceName, version);
-        UrlLists.add(url) ;
+        URL url = URL.buildServiceUrl(interfaceName, version,serverPort);
+        UrlLists.add(url);
     }
 
-    public  void registerTest() throws Exception {
+    public void registerTest() throws Exception {
 
         if (zkRegistry == null) {
             log.error("no registry found!!");
@@ -65,7 +81,7 @@ public class NettyServer implements Server {
     public void start() throws Exception {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workderGroup = new NioEventLoopGroup();
-        // LEARN
+        // LEARN Netty业务线程
         DefaultEventExecutorGroup serviceHandlerGroup = new DefaultEventExecutorGroup(
                 RuntimeUtil.getProcessorCount() * 2,
                 ThreadUtil.newNamedThreadFactory("service-handler-group", false)
@@ -78,38 +94,37 @@ public class NettyServer implements Server {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
                             ChannelPipeline pipeline = ch.pipeline();
+//                            30秒没有读事件发生
                             pipeline.addLast(new IdleStateHandler(30, 0, 0, TimeUnit.SECONDS));
                             pipeline.addLast(new RpcMessageEncoder());
                             pipeline.addLast(new RpcMessageDecoder());
                             pipeline.addLast(serviceHandlerGroup, new RpcServerHandler());
                         }
                     });
-            String[] arr = serverAddr.split(":");
-            String host = arr[0];
-            int port = Integer.parseInt(arr[1]);
-            ChannelFuture future = bootstrap.bind(host, port).sync();
 
-            //TODO 服务注册
+            ChannelFuture future = bootstrap.bind(serverAddr, serverPort).sync();
+
             if (zkRegistry == null) {
                 log.error("no registry found!!");
             }
             zkRegistry.register(UrlLists);
 
-            log.info("Server started on port{}",port) ;
-            future.channel().closeFuture().sync() ;
+            log.info("Server started on port{}", serverPort);
+            future.channel().closeFuture().sync();
         } catch (Exception ex) {
             if (ex instanceof InterruptedException) {
                 log.error("server InterruptedException");
-            }else{
-                log.error("server error !! ");
+            } else {
+                log.error("server error !! {}",ex.getMessage());
             }
         } finally {
-            try{
-                //TODO 服务解注册
+            try {
+                assert zkRegistry != null;
+                zkRegistry.unRegisterAllMyService();
                 bossGroup.shutdownGracefully();
                 workderGroup.shutdownGracefully();
-            }catch (Exception ex){
-                log.error(ex.getMessage(),ex) ;
+            } catch (Exception ex) {
+                log.error(ex.getMessage(), ex);
             }
 
         }

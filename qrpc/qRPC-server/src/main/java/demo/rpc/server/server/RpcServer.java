@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
@@ -16,7 +18,7 @@ import java.util.Map;
 /**
  * 接口名：demo.rpc.example.service.CalculatorService
  * 版本 ：1.0
---————————————————————————————————————————————————————————————
+ * --————————————————————————————————————————————————————————————
  * 接口名：demo.rpc.example.service.HelloService
  * 版本 ：1.0
  */
@@ -30,18 +32,26 @@ import java.util.Map;
  */
 @Slf4j
 @Component
-public class RpcServer extends NettyServer implements InitializingBean, DisposableBean, ApplicationContextAware  {
-    static String registryAddr="192.168.57.100:2181" ;
-    static String serverAddr="127.0.0.1:8080" ;
+public class RpcServer extends NettyServer implements InitializingBean, DisposableBean, ApplicationContextAware {
+
+    //TODO 端口，ip的配置
+    @Value("${zookeeper.port}")
+    int zkPort;
+
+    @Value("${server.port}")
+    int serverPort;
+
+    @Value("${server.address}")
+    String serverAddress;
+
+    @Value("${zookeeper.address}")
+    String zkAddress;
 
 
-    public RpcServer(String serverAddr, String registryAddr) {
-        super(serverAddr, registryAddr);
+    public RpcServer(){
+        super();
     }
 
-    public  RpcServer(){
-        super(serverAddr, registryAddr);
-    }
     /**
      * 容器启动时,扫描容器内被@RpcService标注的服务。
      * @param ctx 容器上下文
@@ -49,33 +59,33 @@ public class RpcServer extends NettyServer implements InitializingBean, Disposab
      */
     @Override
     public void setApplicationContext(ApplicationContext ctx) throws BeansException {
+        setZkRegistry(serverAddress,serverPort,zkAddress+":"+zkPort);
         Map<String, Object> serviceMap = ctx.getBeansWithAnnotation(RpcService.class);
-        if(MapUtil.isEmpty(serviceMap)){
-            log.debug("no service find!") ;
+        if (MapUtil.isEmpty(serviceMap)) {
+            log.warn("no service found!");
             return;
         }
-        for (Object service : serviceMap.values())
-        {
+        for (Object service : serviceMap.values()) {
             RpcService rpcService = service.getClass().getAnnotation(RpcService.class);
             String interfaceName = rpcService.value().getName();
-//            System.out.println("接口名："+interfaceName);
+
             String version = rpcService.version();
-//            System.out.println("版本 ："+version);
-            super.addService(interfaceName, version);
+            log.info("接口名称 interface={}",interfaceName);
+            log.info("接口版本 version={}",version);
+            addService(interfaceName, version);
+            //缓存到本地。
+            RpcServiceCache.addServiceToLocalCache(version, service);
         }
 
     }
-
-
     @Override
     public void destroy() throws Exception {
-//        super.stop();
+        super.stop();
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
-//        super.start();
-        registerTest();
+        super.start();
     }
 
 

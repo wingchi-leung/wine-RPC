@@ -27,6 +27,8 @@ public class RpcResponse<T> {
      * 响应数据
      */
     private T data ;
+
+
     public static <T> RpcResponse<T> success(T data,long requestId){
         return RpcResponse.<T>builder()
                 .code(ResponseCode.SUCCESS.getCode())

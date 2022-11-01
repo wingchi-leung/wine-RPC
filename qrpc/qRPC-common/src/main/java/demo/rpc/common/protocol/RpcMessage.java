@@ -13,9 +13,27 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class RpcMessage {
+    /**
+     * 序列化类型
+     */
     private byte serializeType;
+    /**
+     * 请求Id
+     */
     private long requestId;
+
+    /**
+     * 请求体
+     */
     private Object data;
+
+    /**
+     * 消息类型
+     */
     private byte messageType;
+
+    /**
+     * 压缩类型
+     */
     private byte compressorType;
 }

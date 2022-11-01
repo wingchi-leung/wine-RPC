@@ -1,19 +1,23 @@
 package demo.rpc.example;
 
-import demo.rpc.example.service.CalculatorService;
+import demo.rpc.example.serviceImpl.CalculatorServiceImpl;
+import demo.rpc.example.serviceImpl.HelloServiceImpl;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import demo.rpc.example.service.HelloService;
-import demo.rpc.server.server.*;
-import demo.rpc.example.service.impl.CalculatorServiceImpl;
-import demo.rpc.example.service.impl.HelloServiceImpl;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-@SpringBootApplication(scanBasePackages = "demo.rpc")
 
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.PropertySource;
+import service.CalculatorService;
+import service.HelloService;
+
+
+@SpringBootApplication(scanBasePackages = {"demo.rpc.server","demo.rpc.common","demo.rpc.example"})
+@PropertySource(value={"classpath:application-zookeeper.properties"})
 public class ExampleServer {
 
     public static void main(String[] args) {
         AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(ExampleServer.class);
-        RpcServer bean = (RpcServer) applicationContext.getBean("rpcServer") ;
+        applicationContext.getBean("rpcServer");
         HelloService helloService = new HelloServiceImpl();
         CalculatorService calculatorService = new CalculatorServiceImpl();
     }

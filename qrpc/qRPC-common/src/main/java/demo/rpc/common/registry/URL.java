@@ -27,21 +27,35 @@ public class URL {
      * 端口
      */
     private final int port;
-
+    /**
+     * 接口名称
+     */
     private final String interfaceName ;
-
+    /**
+     * 版本号
+     */
     private final String version ;
 
 
 
     //TODO 端口号
-    public static URL buildServiceUrl(String interfaceName,String version) {
+    public static URL buildServiceUrl(String interfaceName,String version,int port ) {
         return URL.builder()
                 .protocol("rpc")
                 .host(NetUtil.getLocalhostStr())
-                .port(8080)
+                .port(port)
                 .interfaceName(interfaceName)
                 .version(version)
                 .build();
+    }
+
+    public  String toAddrString(URL url){
+        return url.getHost()+":"+url.getPort();
+    }
+
+    public static URL valueOf(String url) {
+        String[] split = url.split(":");
+        return URL.builder().host(split[0]).port(Integer.parseInt(split[1])).build();
+
     }
 }

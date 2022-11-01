@@ -22,31 +22,31 @@
         </encoder>
     </appender>
 
-    <appender name="RollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_DIR}/dayLogFile.%d{yyyy-MM-dd}.log</fileNamePattern>
-            <maxHistory>30</maxHistory>
-        </rollingPolicy>
-        <encoder>
-            <pattern>${FILE_LOG_PATTERN}</pattern>
-        </encoder>
-    </appender>
+<!--    <appender name="RollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">-->
+<!--        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">-->
+<!--            <fileNamePattern>${LOG_DIR}/dayLogFile.%d{yyyy-MM-dd}.log</fileNamePattern>-->
+<!--            <maxHistory>30</maxHistory>-->
+<!--        </rollingPolicy>-->
+<!--        <encoder>-->
+<!--            <pattern>${FILE_LOG_PATTERN}</pattern>-->
+<!--        </encoder>-->
+<!--    </appender>-->
 
-    <!-- 使用root的appender-ref -->
-    <logger name="com.example.Logger1" level="DEBUG" additivity="true">
-    </logger>
+<!--    &lt;!&ndash; 使用root的appender-ref &ndash;&gt;-->
+<!--    <logger name="com.example.Logger1" level="DEBUG" additivity="true">-->
+<!--    </logger>-->
 
-    <!-- 不使用root的appender-ref -->
-    <logger name="com.example.Logger2" level="DEBUG" additivity="false">
-    </logger>
+<!--    &lt;!&ndash; 不使用root的appender-ref &ndash;&gt;-->
+<!--    <logger name="com.example.Logger2" level="DEBUG" additivity="false">-->
+<!--    </logger>-->
 
-    <logger name="com.example.Logger3" level="DEBUG" additivity="false">
-        <appender-ref ref="STDOUT"/>
-    </logger>
+<!--    <logger name="com.example.Logger3" level="DEBUG" additivity="false">-->
+<!--        <appender-ref ref="STDOUT"/>-->
+<!--    </logger>-->
 
-    <root level="DEBUG">
+    <root level="INFO">
         <appender-ref ref="STDOUT" />
-        <appender-ref ref="FILE" />
-        <appender-ref ref="RollingFile" />
+<!--        <appender-ref ref="FILE" />-->
+<!--        <appender-ref ref="RollingFile" />-->
     </root>
 </configuration>

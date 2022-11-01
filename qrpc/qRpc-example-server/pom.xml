@@ -24,7 +24,7 @@
         </dependency>
         <dependency>
             <groupId>com.wingchi</groupId>
-            <artifactId>qRPC-common</artifactId>
+            <artifactId>qRpc-common-api</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>

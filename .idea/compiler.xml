@@ -7,16 +7,22 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="qRPC-server" />
-        <module name="qRpc-client" />
+        <module name="qRpc-common-api" />
         <module name="qRPC-common" />
         <module name="qRpc-example-server" />
+        <module name="qRPC-server" />
+        <module name="qRpc-client" />
+        <module name="qRpc-example-client" />
+        <module name="qRpc-core" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="qrpc" target="1.8" />
       <module name="qRpc-client" target="8" />
       <module name="qRPC-common" target="8" />
+      <module name="qRpc-common-api" target="8" />
+      <module name="qRpc-core" target="8" />
+      <module name="qRpc-example-client" target="8" />
       <module name="qRpc-example-server" target="8" />
       <module name="qRPC-server" target="8" />
     </bytecodeTargetLevel>
@@ -26,6 +32,9 @@
       <module name="qRPC-common" options="-parameters" />
       <module name="qRPC-server" options="-parameters" />
       <module name="qRpc-client" options="-parameters" />
+      <module name="qRpc-common-api" options="-parameters" />
+      <module name="qRpc-core" options="-parameters" />
+      <module name="qRpc-example-client" options="-parameters" />
       <module name="qRpc-example-server" options="-parameters" />
       <module name="qrpc" options="-parameters" />
     </option>

@@ -4,6 +4,9 @@
     <file url="file://$PROJECT_DIR$/qrpc/qRPC-common/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/qrpc/qRPC-server/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/qrpc/qRpc-client/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/qrpc/qRpc-common-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/qrpc/qRpc-core/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/qrpc/qRpc-example-client/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/qrpc/qRpc-example-server/src/main/java" charset="UTF-8" />
   </component>
 </project>

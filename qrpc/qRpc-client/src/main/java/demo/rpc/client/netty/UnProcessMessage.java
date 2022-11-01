@@ -1,4 +1,4 @@
-package netty;
+package demo.rpc.client.netty;
 
 import cn.hutool.json.JSONUtil;
 import demo.rpc.common.protocol.RpcResponse;
@@ -19,7 +19,6 @@ public class UnProcessMessage {
         if(future!=null){
             future.complete(rpcResponse) ;
         }else{
-            //LEARN 这是啥意思？
             throw new IllegalArgumentException("future is null.rpcResponse="+ JSONUtil.toJsonStr(rpcResponse));
         }
     }

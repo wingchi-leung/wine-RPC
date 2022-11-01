@@ -7,11 +7,13 @@ import demo.rpc.common.constant.ProtocolConstants;
 import demo.rpc.common.constant.SerializeType;
 import demo.rpc.common.protocol.RpcMessage;
 import demo.rpc.common.serialize.Serializer;
+import demo.rpc.common.serialize.protostuff.ProtoStuffSerializer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Iterator;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.stream.StreamSupport;
@@ -89,7 +91,13 @@ public class RpcMessageEncoder extends MessageToByteEncoder<RpcMessage> {
         }
         //将对象序列化
         ServiceLoader<Serializer> serializers = ServiceLoader.load(Serializer.class);
-        Serializer serializer = serializers.iterator().next();
+        Serializer serializer = new ProtoStuffSerializer();
+        if(!serializers.iterator().hasNext()){
+//            throw new RuntimeException("找不到SPI的序列化器！");
+            log.error("SPI 接口啊啊啊");
+        }
+
+
         log.debug("找到序列化器：,{}", serializer.toString());
         byte[] data = serializer.serialize(rpcMessage.getData());
 
