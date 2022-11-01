@@ -1,25 +1,12 @@
 # wine-RPC
-一个Zookeeper+netty+Spring实现的RPC轮子框架
+Zookeeper+netty实现的RPC轮子框架
 
-### 整体架构
+服务器启动流程：
 
+<img src="https://user-images.githubusercontent.com/57536804/181868343-9a5690c1-e34c-45b9-918a-f0fe3208a94d.png" alt="img" style="zoom:50%;" />
 
+Netty客户端的处理流程 
 
-### 通信协议
+![image](https://user-images.githubusercontent.com/57536804/181871386-880a3bbf-f323-486b-8131-66b22ae1a8d0.png)
 
-TCP是面向流的，没有边界，OS在发送TCP数据时，会通过缓冲区进行优化
-
-- 如果一次请求发送的数据量比较小，没达到缓冲区大小，TCP会将多个请求合并为同一个请求进行发送，这就是粘包。
-
-- 如果一次请求发送的数据量比较大，超过了缓冲区大小，TCP就会将其拆分为多次发送，这就是拆包。
-
-本框架使用了自定义RPC协议解决这个问题，协议体如下：
-
-
-
-### 序列化协议
-
-
-
-### 负载均衡
 
