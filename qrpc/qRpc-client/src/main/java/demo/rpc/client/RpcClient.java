@@ -17,8 +17,6 @@ import java.lang.reflect.Field;
 public class RpcClient implements ApplicationContextAware, DisposableBean {
 
 
-
-
     private final ZkDiscovery zkDiscovery;
 
     public RpcClient() {
@@ -36,7 +34,7 @@ public class RpcClient implements ApplicationContextAware, DisposableBean {
         //查找所有bean,找出字段中定义有注解的
         for (String beanName : beanNames) {
             //这里简单处理循环依赖的问题。
-            if(beanName.equals("rpcClient")) continue;
+            if (beanName.equals("rpcClient")) continue;
             Object bean = ctx.getBean(beanName);
             Field[] declaredFields = bean.getClass().getDeclaredFields();
             try {

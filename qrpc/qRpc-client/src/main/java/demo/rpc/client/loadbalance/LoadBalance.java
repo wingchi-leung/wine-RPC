@@ -6,5 +6,5 @@ import demo.rpc.common.registry.URL;
 import java.util.List;
 
 public interface LoadBalance {
-    URL select(List<URL> urlList, RpcRequest request) ;
+    URL select(List<URL> urlList, RpcRequest request);
 }

@@ -87,7 +87,7 @@ public class RpcServerHandler extends SimpleChannelInboundHandler<RpcMessage> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        log.error("server catch exception...",cause);
+        log.error("server catch exception...", cause);
         ctx.close();
     }
 }

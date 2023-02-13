@@ -30,10 +30,11 @@ public class NettyInvoker {
 
     private final Discovery discovery = ZkDiscovery.getInstance();
 
-    private final NettyClient nettyClient= NettyClient.getInstance();
+    private final NettyClient nettyClient = NettyClient.getInstance();
 
     /**
      * 调用RPC方法
+     *
      * @param request
      * @return
      */
@@ -44,25 +45,25 @@ public class NettyInvoker {
         //查找注册中心中符合的服务
         List<URL> urlList = discovery.discover(url);
         URL select = loadBalance.select(urlList, request);
-        return doInvoke(request,select);
+        return doInvoke(request, select);
     }
 
     private RpcResult doInvoke(RpcRequest request, URL select) {
-        InetSocketAddress socketAddress = new InetSocketAddress(select.getHost(),select.getPort());
+        InetSocketAddress socketAddress = new InetSocketAddress(select.getHost(), select.getPort());
         Channel channel = nettyClient.getChannel(socketAddress);
-        if(!channel.isActive()){
-            throw new RuntimeException("channel is not active. address = "+ socketAddress);
+        if (!channel.isActive()) {
+            throw new RuntimeException("channel is not active. address = " + socketAddress);
         }
         CompletableFuture<RpcResponse<?>> resultFuture = new CompletableFuture<>();
         RpcMessage rpcMessage = buildRpcMessage(request);
-        UnProcessMessage.put(rpcMessage.getRequestId(),resultFuture);
-        channel.writeAndFlush(rpcMessage).addListener((ChannelFutureListener) future->{
-            if(future.isSuccess()){
-                log.info("client send message :[{}]",rpcMessage);
-            }else{
+        UnProcessMessage.put(rpcMessage.getRequestId(), resultFuture);
+        channel.writeAndFlush(rpcMessage).addListener((ChannelFutureListener) future -> {
+            if (future.isSuccess()) {
+                log.info("client send message :[{}]", rpcMessage);
+            } else {
                 future.channel().close();
                 resultFuture.completeExceptionally(future.cause());
-                log.error("client send failed: ",future.cause());
+                log.error("client send failed: ", future.cause());
             }
         });
         return new AsyncResult(resultFuture);
