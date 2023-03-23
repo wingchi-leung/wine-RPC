@@ -1,20 +1,19 @@
 package demo.rpc.server.server;
 
-import demo.rpc.common.annotation.RpcService;
 import cn.hutool.core.map.MapUtil;
+import demo.rpc.common.annotation.RpcService;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
-// LEARN ctxRPC的实现方法?
-
 /**
  * 接口名：demo.rpc.example.service.CalculatorService
  * 版本 ：1.0
@@ -34,7 +33,6 @@ import java.util.Map;
 @Component
 public class RpcServer extends NettyServer implements InitializingBean, DisposableBean, ApplicationContextAware {
 
-    //TODO 端口，ip的配置
     @Value("${zookeeper.port}")
     int zkPort;
 
@@ -57,6 +55,7 @@ public class RpcServer extends NettyServer implements InitializingBean, Disposab
      * @param ctx 容器上下文
      * @throws BeansException 异常
      */
+    @SneakyThrows
     @Override
     public void setApplicationContext(ApplicationContext ctx) throws BeansException {
         setZkRegistry(serverAddress,serverPort,zkAddress+":"+zkPort);
@@ -65,13 +64,13 @@ public class RpcServer extends NettyServer implements InitializingBean, Disposab
             log.warn("no service found!");
             return;
         }
+        //https://blog.csdn.net/ypp91zr/article/details/103730870
         for (Object service : serviceMap.values()) {
-            RpcService rpcService = service.getClass().getAnnotation(RpcService.class);
+            Class<?>  target = AopProxyUtils.ultimateTargetClass(service);
+            RpcService rpcService = target.getAnnotation(RpcService.class);
+            log.info("接口名称 interface={}",rpcService.value().getName());
             String interfaceName = rpcService.value().getName();
-
             String version = rpcService.version();
-            log.info("接口名称 interface={}",interfaceName);
-            log.info("接口版本 version={}",version);
             addService(interfaceName, version);
             //缓存到本地。
             RpcServiceCache.addServiceToLocalCache(version, service);
@@ -87,6 +86,4 @@ public class RpcServer extends NettyServer implements InitializingBean, Disposab
     public void afterPropertiesSet() throws Exception {
         super.start();
     }
-
-
 }

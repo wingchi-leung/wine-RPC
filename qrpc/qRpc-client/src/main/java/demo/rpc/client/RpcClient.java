@@ -1,13 +1,16 @@
 package demo.rpc.client;
 
 import demo.rpc.client.discovery.ZkDiscovery;
+import demo.rpc.client.reflect.RpcProxy;
 import demo.rpc.common.annotation.RpcAutowire;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.aop.framework.Advised;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import demo.rpc.client.reflect.RpcProxy;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
@@ -27,15 +30,19 @@ public class RpcClient implements ApplicationContextAware, DisposableBean {
         this.zkDiscovery = zkDiscovery;
     }
 
+    @SneakyThrows
     @Override
     public void setApplicationContext(ApplicationContext ctx) throws BeansException {
         String[] beanNames = ctx.getBeanDefinitionNames();
 
         //查找所有bean,找出字段中定义有注解的
         for (String beanName : beanNames) {
-            //这里简单处理循环依赖的问题。
+            //简单处理循环依赖的问题。
             if (beanName.equals("rpcClient")) continue;
             Object bean = ctx.getBean(beanName);
+            if (AopUtils.isAopProxy(bean)) {
+                bean = ((Advised) bean).getTargetSource().getTarget();
+            }
             Field[] declaredFields = bean.getClass().getDeclaredFields();
             try {
                 for (Field field : declaredFields) {
@@ -47,6 +54,9 @@ public class RpcClient implements ApplicationContextAware, DisposableBean {
                         log.info("获取的类别是:{}", field.getType());
                         field.set(bean, RpcProxy.createServiceProxy(field.getType(), version));
 
+                    }  else if (AopUtils.isAopProxy(bean)) {
+                        bean = ((Advised) bean).getTargetSource().getTarget();
+                        declaredFields = bean.getClass().getDeclaredFields();
                     }
                 }
             } catch (IllegalAccessException e) {
