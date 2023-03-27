@@ -5,9 +5,8 @@ import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.RuntimeUtil;
 import demo.rpc.common.netty.RpcMessageDecoder;
 import demo.rpc.common.netty.RpcMessageEncoder;
-import demo.rpc.common.registry.URL;
 import demo.rpc.server.nettyHandler.RpcServerHandler;
-import demo.rpc.server.registry.zkRegistry;
+import demo.rpc.server.registry.ZkRegistry;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -18,51 +17,29 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.concurrent.DefaultEventExecutorGroup;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
 @Slf4j
-public class NettyServer implements Server {
+@NoArgsConstructor
+@Component
+public class NettyServer implements Server, Runnable {
 
-    private String serverAddr;
-    private zkRegistry zkRegistry;
-    private List<URL> UrlLists = new ArrayList<>();
-    private int serverPort;
-    public NettyServer(String serverAddr, String registryAddr) {
-        log.info("registry address: {}", registryAddr);
-        log.info("server address: {}", serverAddr);
-        this.serverAddr = serverAddr;
-        zkRegistry = new zkRegistry(registryAddr);
-    }
+    @Value("${netty.port}")
+    int serverPort;
 
-    public NettyServer() {
+    @Value("${server.address}")
+    String serverAddress;
 
-    }
 
-    public void setZkRegistry(String serverAddr, int serverPort, String registryString) {
-        log.info("registry address: {}", registryString);
-        log.info("server address: {}", serverAddr);
-        this.serverAddr = serverAddr;
-        this.serverPort=serverPort;
-        zkRegistry = new zkRegistry(registryString);
-    }
-
-    protected void addService(String interfaceName, String version) {
-        log.info("add demo.rpc.service,interface:{} ,version:{}", interfaceName, version);
-        URL url = URL.buildServiceUrl(interfaceName, version, serverPort);
-        UrlLists.add(url);
-    }
-
-    public void registerTest() throws Exception {
-        if (zkRegistry == null) {
-            log.error("no registry found!!");
-        }
-        zkRegistry.register(UrlLists);
-    }
+    @Autowired
+    private ZkRegistry zkRegistry;
 
 
     /**
@@ -94,12 +71,7 @@ public class NettyServer implements Server {
                             pipeline.addLast(serviceHandlerGroup, new RpcServerHandler());
                         }
                     });
-            ChannelFuture future = bootstrap.bind(serverAddr,serverPort).sync();
-
-            if (zkRegistry == null) {
-                log.error("no registry found!!");
-            }
-            zkRegistry.register(UrlLists);
+            ChannelFuture future = bootstrap.bind(serverAddress, serverPort).sync();
             log.info("Server started on port：{}", serverPort);
             future.channel().closeFuture().sync();
             System.out.println("netty 服务器启动成功!");
@@ -111,8 +83,7 @@ public class NettyServer implements Server {
             }
         } finally {
             try {
-                assert zkRegistry != null;
-                zkRegistry.unRegisterAllMyService();
+                unregister();
                 bossGroup.shutdownGracefully();
                 workderGroup.shutdownGracefully();
             } catch (Exception ex) {
@@ -124,6 +95,20 @@ public class NettyServer implements Server {
 
     @Override
     public void stop() throws Exception {
+    }
+
+    @Override
+    public void run() {
+        try {
+            start();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    public void unregister() {
+        zkRegistry.unRegisterAllMyService();
     }
 
 }

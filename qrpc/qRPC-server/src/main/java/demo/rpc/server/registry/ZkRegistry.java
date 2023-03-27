@@ -2,9 +2,11 @@ package demo.rpc.server.registry;
 
 import demo.rpc.common.registry.Registry;
 import demo.rpc.common.registry.URL;
-import demo.rpc.common.zookeeper.SessionConnectionListener;
-import lombok.extern.slf4j.Slf4j;
 import demo.rpc.common.zookeeper.CuratorClient;
+import demo.rpc.common.zookeeper.SessionConnectionListener;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -17,13 +19,15 @@ import static demo.rpc.common.constant.RegistryConstant.ROOT_PATH;
  * 服务注册类
  */
 @Slf4j
-public class zkRegistry implements Registry {
+@NoArgsConstructor
+@Component
+public class ZkRegistry implements Registry {
 
-    private final CuratorClient curatorClient;
-    private final List<String> pathList=new ArrayList<>();
+    private CuratorClient curatorClient;
+    private List<String> pathList = new ArrayList<>();
 
-    public zkRegistry(String registryAddr) {
-        this.curatorClient = new CuratorClient(registryAddr,5000) ;
+    public void initZkRegistry(String registryAddr) {
+        this.curatorClient = new CuratorClient(registryAddr, 5000);
     }
 
 
@@ -32,29 +36,28 @@ public class zkRegistry implements Registry {
      * @param UrlLists url表
      */
     @Override
-    public void register(List<URL> UrlLists ) throws Exception {
+    public void register(List<URL> UrlLists) throws Exception {
 //        创建根节点(持久化)
         String res0 = curatorClient.createPersistent(ROOT_PATH, null);
-        log.info("创建根节点:{}",res0);
-        for(URL url : UrlLists){
+        log.info("创建根节点:{}", res0);
+        for (URL url : UrlLists) {
             //创建服务节点(持久化)
             String servicePath = ROOT_PATH + "/" + url.getInterfaceName();
-            log.info("注册服务节点..{}",servicePath);
+            log.info("注册服务节点..{}", servicePath);
             String res = curatorClient.createPersistent(servicePath, null);
-            log.debug("创建服务节点:{}",res);
+            log.debug("创建服务节点:{}", res);
             //创建address节点(临时)
-            String addressPath = servicePath+"/"+PROVIDERS;
-            String address = url.getHost()+ ":"+ url.getPort();
-            String path = curatorClient.createEphemeralNode(addressPath,address.getBytes(StandardCharsets.UTF_8));
+            String addressPath = servicePath + "/" + PROVIDERS;
+            String address = url.getHost() + ":" + url.getPort();
+            String path = curatorClient.createEphemeralNode(addressPath, address.getBytes(StandardCharsets.UTF_8));
             curatorClient.getClient()
                     .getConnectionStateListenable()
-                    .addListener(new SessionConnectionListener(addressPath,address));
+                    .addListener(new SessionConnectionListener(addressPath, address));
             log.info("创建地址节点:{}", path);
-            pathList.add(path) ;
+            pathList.add(path);
 
         }
     }
-
 
 
     @Override
@@ -65,15 +68,13 @@ public class zkRegistry implements Registry {
     @Override
     public void unRegisterAllMyService() {
         log.info("UnRegister all service");
-        for(String path:pathList){
+        for (String path : pathList) {
             try {
                 curatorClient.deletePath(path);
             } catch (Exception e) {
-                log.error("delete service path error "+e.getMessage());
+                log.error("delete service path error " + e.getMessage());
             }
         }
     }
-
-
 
 }
