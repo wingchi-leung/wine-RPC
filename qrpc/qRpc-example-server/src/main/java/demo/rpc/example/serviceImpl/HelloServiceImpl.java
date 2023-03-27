@@ -1,7 +1,7 @@
 package demo.rpc.example.serviceImpl;
 
 
-import service.HelloService;
+import demo.rpc.commonapi.service.HelloService;
 import demo.rpc.common.annotation.RpcService;
 
 @RpcService(value = HelloService.class,version = "1.0")

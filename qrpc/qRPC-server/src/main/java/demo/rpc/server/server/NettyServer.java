@@ -5,39 +5,33 @@ import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.RuntimeUtil;
 import demo.rpc.common.netty.RpcMessageDecoder;
 import demo.rpc.common.netty.RpcMessageEncoder;
-import demo.rpc.common.registry.Registry;
 import demo.rpc.common.registry.URL;
-import demo.rpc.common.util.ServiceUtil;
 import demo.rpc.server.nettyHandler.RpcServerHandler;
+import demo.rpc.server.registry.zkRegistry;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.*;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.concurrent.DefaultEventExecutorGroup;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
-import demo.rpc.server.registry.zkRegistry;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 
 @Slf4j
 public class NettyServer implements Server {
 
     private String serverAddr;
-    private int serverPort;
     private zkRegistry zkRegistry;
     private List<URL> UrlLists = new ArrayList<>();
-
+    private int serverPort;
     public NettyServer(String serverAddr, String registryAddr) {
         log.info("registry address: {}", registryAddr);
         log.info("server address: {}", serverAddr);
@@ -45,7 +39,7 @@ public class NettyServer implements Server {
         zkRegistry = new zkRegistry(registryAddr);
     }
 
-    public NettyServer(){
+    public NettyServer() {
 
     }
 
@@ -59,12 +53,11 @@ public class NettyServer implements Server {
 
     protected void addService(String interfaceName, String version) {
         log.info("add demo.rpc.service,interface:{} ,version:{}", interfaceName, version);
-        URL url = URL.buildServiceUrl(interfaceName, version,serverPort);
+        URL url = URL.buildServiceUrl(interfaceName, version, serverPort);
         UrlLists.add(url);
     }
 
     public void registerTest() throws Exception {
-
         if (zkRegistry == null) {
             log.error("no registry found!!");
         }
@@ -101,21 +94,20 @@ public class NettyServer implements Server {
                             pipeline.addLast(serviceHandlerGroup, new RpcServerHandler());
                         }
                     });
-
-            ChannelFuture future = bootstrap.bind(serverAddr, serverPort).sync();
+            ChannelFuture future = bootstrap.bind(serverAddr,serverPort).sync();
 
             if (zkRegistry == null) {
                 log.error("no registry found!!");
             }
             zkRegistry.register(UrlLists);
-
-            log.info("Server started on port{}", serverPort);
+            log.info("Server started on port：{}", serverPort);
             future.channel().closeFuture().sync();
+            System.out.println("netty 服务器启动成功!");
         } catch (Exception ex) {
             if (ex instanceof InterruptedException) {
                 log.error("server InterruptedException");
             } else {
-                log.error("server error !! {}",ex.getMessage());
+                log.error("server error !! {}", ex.getMessage());
             }
         } finally {
             try {

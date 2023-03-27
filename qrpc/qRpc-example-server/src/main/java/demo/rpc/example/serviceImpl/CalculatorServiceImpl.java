@@ -2,7 +2,7 @@ package demo.rpc.example.serviceImpl;
 
 
 import demo.rpc.common.annotation.RpcService;
-import service.CalculatorService;
+import demo.rpc.commonapi.service.CalculatorService;
 
 @RpcService(value = CalculatorService.class,version = "1.0")
 public class CalculatorServiceImpl implements CalculatorService {

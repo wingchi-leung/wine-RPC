@@ -1,0 +1,20 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/bank?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false
+    username: root
+    password: ss123000
+  aop:
+    proxy-target-class: true
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+server:
+  port: 10098
+
+
+#logging:
+#  level:
+#    root: debug
+netty:
+  port: 10088

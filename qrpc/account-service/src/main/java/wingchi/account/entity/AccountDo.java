@@ -17,7 +17,7 @@ public class AccountDo {
     @TableId(type = IdType.AUTO)
     private Long accountId;
 
-    private String name;
+    private String fullName;
 
     private BigDecimal balance;
 
@@ -25,8 +25,13 @@ public class AccountDo {
 
     private String phone;
 
-    private LocalDateTime addTime;
+    private String email;
 
+    private BigDecimal number;
+
+    private String password;
+
+    private LocalDateTime addTime;
 
     private LocalDateTime updateTime;
 

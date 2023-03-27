@@ -8,4 +8,4 @@ spring:
 zookeeper:
   port: 8080
 server:
-  port: 8081
+  port: 8099

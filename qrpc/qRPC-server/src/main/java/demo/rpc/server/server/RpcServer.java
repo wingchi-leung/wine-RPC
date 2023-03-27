@@ -2,12 +2,9 @@ package demo.rpc.server.server;
 
 import cn.hutool.core.map.MapUtil;
 import demo.rpc.common.annotation.RpcService;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -31,12 +28,12 @@ import java.util.Map;
  */
 @Slf4j
 @Component
-public class RpcServer extends NettyServer implements InitializingBean, DisposableBean, ApplicationContextAware {
+public class RpcServer implements ApplicationContextAware{
 
     @Value("${zookeeper.port}")
     int zkPort;
 
-    @Value("${server.port}")
+    @Value("${netty.port}")
     int serverPort;
 
     @Value("${server.address}")
@@ -55,7 +52,6 @@ public class RpcServer extends NettyServer implements InitializingBean, Disposab
      * @param ctx 容器上下文
      * @throws BeansException 异常
      */
-    @SneakyThrows
     @Override
     public void setApplicationContext(ApplicationContext ctx) throws BeansException {
         setZkRegistry(serverAddress,serverPort,zkAddress+":"+zkPort);
@@ -73,17 +69,11 @@ public class RpcServer extends NettyServer implements InitializingBean, Disposab
             String version = rpcService.version();
             addService(interfaceName, version);
             //缓存到本地。
-            RpcServiceCache.addServiceToLocalCache(version, service);
+            RpcServiceCache.addServiceToLocalCache(version, target,service);
         }
 
     }
-    @Override
-    public void destroy() throws Exception {
-        super.stop();
-    }
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        super.start();
-    }
+
+
 }

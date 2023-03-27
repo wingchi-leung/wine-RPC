@@ -1,7 +1,4 @@
-server:
-    port: 10080
-Zk:
-  port: 8088
+
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -13,3 +10,19 @@ spring:
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
+server:
+  port: 8081
+#  tomcat:
+#    accesslog:
+#      enabled: true
+#      file-date-format: .yyyy-MM-dd
+#      suffix: .log
+#      prefix: access_log
+#      directory: tomcat_log
+#      pattern: common
+#    basedir: D:/tmp
+#logging:
+#  level:
+#    root: debug
+netty:
+  port: 10098

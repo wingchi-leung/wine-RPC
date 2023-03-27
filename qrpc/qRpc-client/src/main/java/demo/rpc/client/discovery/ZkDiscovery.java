@@ -20,7 +20,7 @@ import static demo.rpc.common.constant.RegistryConstant.ROOT_PATH;
 
 public class ZkDiscovery implements Discovery {
 
-    private final String discoverAddress =  "169.254.192.182:2181" ;
+    private final String discoverAddress =  "192.168.43.56:2181" ;
 
     private static volatile ZkDiscovery zkDiscovery= null ;
 

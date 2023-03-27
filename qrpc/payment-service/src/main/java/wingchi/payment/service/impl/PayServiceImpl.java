@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import demo.rpc.common.annotation.RpcAutowire;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import service.AccountService;
+import demo.rpc.commonapi.service.AccountService;
 import wingchi.payment.dto.PaymentDto;
 import wingchi.payment.entity.PaymentDo;
 import wingchi.payment.mapper.PayMapper;

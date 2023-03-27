@@ -12,8 +12,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class RpcServiceCache {
     private static final Map<String, Object> serviceMap = new ConcurrentHashMap<>();
-    public static void addServiceToLocalCache(String version, Object service ){
-        Class<?>[] interfaces = service.getClass().getInterfaces();
+    public static void addServiceToLocalCache(String version, Class<?> service,Object proxyService ){
+        Class<?>[] interfaces = service.getInterfaces();
         if(interfaces.length==0){
             throw new RuntimeException("rpc service didn't implement any interface!, service ："+service.getClass().getName());
         }
@@ -23,7 +23,7 @@ public class RpcServiceCache {
             RpcServiceName = RpcServiceName.concat("_" + version);
         }
         log.info("缓存。。。。RpcServiceName cache: {}",RpcServiceName);
-        serviceMap.putIfAbsent(RpcServiceName,service);
+        serviceMap.putIfAbsent(RpcServiceName,proxyService);
         log.info(StrUtil.format("add Service. rpcServiceName={},class={}",RpcServiceName,service.getClass()));
     }
 
