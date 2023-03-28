@@ -1,4 +1,4 @@
-package wingchi.transfer;
+package demo.rpc.commonapi.dto;
 
 public enum TransactionType {
     TRANSFER,

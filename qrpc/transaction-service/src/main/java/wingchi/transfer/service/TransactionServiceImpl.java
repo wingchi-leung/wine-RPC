@@ -2,9 +2,10 @@ package wingchi.transfer.service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import demo.rpc.common.annotation.RpcService;
+import demo.rpc.commonapi.dto.TransactionDto;
 import demo.rpc.commonapi.dto.TransactionVo;
+import demo.rpc.commonapi.service.TransactionService;
 import org.springframework.stereotype.Service;
-import wingchi.transfer.dto.CreateDto;
 import wingchi.transfer.entity.TransactionDo;
 import wingchi.transfer.mapper.TransactionMapper;
 
@@ -21,7 +22,7 @@ public class TransactionServiceImpl  extends ServiceImpl<TransactionMapper, Tran
     }
 
     @Override
-    public void createTransaction(CreateDto createDto) {
+    public void createTransaction(TransactionDto createDto) {
         TransactionDo transactionDo = TransactionDo.fromCreateDto(createDto);
         save(transactionDo);
     }

@@ -10,6 +10,6 @@ mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
 server:
-  port: 8081
+  port: 10089
 netty:
   port: 9090

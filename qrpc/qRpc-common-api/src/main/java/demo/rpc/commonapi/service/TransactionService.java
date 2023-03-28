@@ -1,12 +1,12 @@
-package wingchi.transfer.service;
+package demo.rpc.commonapi.service;
 
+import demo.rpc.commonapi.dto.TransactionDto;
 import demo.rpc.commonapi.dto.TransactionVo;
-import wingchi.transfer.dto.CreateDto;
 
 import java.util.List;
 
 public interface TransactionService {
     List<TransactionVo> getTransactionList();
 
-    void createTransaction(CreateDto createDto);
+    void createTransaction(TransactionDto createDto);
 }

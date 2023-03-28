@@ -8,7 +8,7 @@ mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
 server:
-  port: 10080
+  port: 9098
   tomcat:
     accesslog:
       enabled: true

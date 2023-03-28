@@ -11,10 +11,5 @@ mybatis-plus:
     map-underscore-to-camel-case: true
 server:
   port: 10098
-
-
-#logging:
-#  level:
-#    root: debug
 netty:
   port: 10088

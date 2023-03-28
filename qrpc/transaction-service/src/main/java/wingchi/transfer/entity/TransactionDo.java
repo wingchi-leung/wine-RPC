@@ -3,9 +3,9 @@ package wingchi.transfer.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import demo.rpc.commonapi.dto.TransactionDto;
 import lombok.Data;
-import wingchi.transfer.TransactionType;
-import wingchi.transfer.dto.CreateDto;
+import demo.rpc.commonapi.dto.TransactionType;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -22,7 +22,7 @@ public class TransactionDo {
     private LocalDateTime updateTime;
     private TransactionType transactionType;
 
-    public static TransactionDo fromCreateDto(CreateDto createDto){
+    public static TransactionDo fromCreateDto(TransactionDto createDto){
         TransactionDo transactionDo = new TransactionDo();
         transactionDo.setAmount(createDto.getAmount());
         transactionDo.setFromAccountId(createDto.getFromAccountId());
