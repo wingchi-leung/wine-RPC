@@ -10,7 +10,6 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@CrossOrigin
 @Slf4j
 public class AccountController {
     private final AccountService accountService;
@@ -44,15 +43,18 @@ public class AccountController {
     }
 
 
-    @PostMapping("/addBalance")
-    public void addBalance(@RequestBody AccountVo accountVo) {
-        accountService.addBalance(accountVo.getAccountId(), accountVo.getAmount());
+
+    @PostMapping("/deposit")
+    public void deposit(@RequestBody AccountVo accountVo) {
+        accountService.deposit(accountVo.getAccountId(), accountVo.getAmount());
     }
 
-    @PostMapping("/deductBalance")
-    public void deductBalance(@RequestBody AccountVo accountVo) {
-        accountService.deductBalance(accountVo.getAccountId(), accountVo.getAmount());
+
+    @PostMapping("/withdraw")
+    public void withdraw(@RequestBody AccountVo accountVo) {
+        accountService.withdraw(accountVo.getAccountId(), accountVo.getAmount());
     }
+
 
 
 }

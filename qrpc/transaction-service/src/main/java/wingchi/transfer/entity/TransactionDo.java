@@ -27,6 +27,7 @@ public class TransactionDo {
         transactionDo.setAmount(createDto.getAmount());
         transactionDo.setFromAccountId(createDto.getFromAccountId());
         transactionDo.setToAccountId(createDto.getToAccountId());
+        transactionDo.setTransactionType(createDto.getTransactionType());
         return transactionDo;
 
     }

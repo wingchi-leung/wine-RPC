@@ -58,6 +58,7 @@ public class NettyInvoker {
         RpcMessage rpcMessage = buildRpcMessage(request);
         UnProcessMessage.put(rpcMessage.getRequestId(), resultFuture);
         channel.writeAndFlush(rpcMessage).addListener((ChannelFutureListener) future -> {
+            // TODO void方法，返回值为空，这里就阻塞住了（拿不到结果）
             if (future.isSuccess()) {
                 log.info("client send message :[{}]", rpcMessage);
             } else {

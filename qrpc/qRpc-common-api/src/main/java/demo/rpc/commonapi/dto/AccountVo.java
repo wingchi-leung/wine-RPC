@@ -8,6 +8,7 @@ import java.util.List;
 @Data
 public class AccountVo {
     private Long accountId;
+    private Long toAccountId;
     private String fullName;
     private BigDecimal number;
     private BigDecimal balance;
@@ -16,6 +17,7 @@ public class AccountVo {
     private Boolean isAdmin;
     private String password;
     private String phone;
+    private TransactionType transactionType;
     private List<TransactionVo> transactions;
 }
 

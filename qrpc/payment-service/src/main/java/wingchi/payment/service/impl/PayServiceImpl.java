@@ -5,6 +5,7 @@ import demo.rpc.common.annotation.RpcAutowire;
 import demo.rpc.commonapi.dto.TransactionDto;
 import demo.rpc.commonapi.dto.TransactionType;
 import demo.rpc.commonapi.service.AccountService;
+import demo.rpc.commonapi.service.TransactionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import wingchi.payment.dto.PaymentDto;
@@ -19,8 +20,8 @@ public class PayServiceImpl extends ServiceImpl<PayMapper, PaymentDo> implements
     @RpcAutowire(version="1.0")
     private AccountService accountService;
 
-//    @RpcAutowire(version = "1.0")
-
+    @RpcAutowire(version = "1.0")
+    private TransactionService transactionService;
 
     @Override
     @Transactional
@@ -38,5 +39,6 @@ public class PayServiceImpl extends ServiceImpl<PayMapper, PaymentDo> implements
         transactionDto.setFromAccountId(paymentDto.getPayerId());
         transactionDto.setToAccountId(paymentDto.getPayeeId());
         transactionDto.setAmount(paymentDto.getAmount());
+        transactionService.createTransaction(transactionDto);
     }
 }

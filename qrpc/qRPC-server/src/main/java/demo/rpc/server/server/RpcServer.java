@@ -14,6 +14,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +44,7 @@ public class RpcServer implements ApplicationContextAware {
     @Value("${netty.port}")
     int serverPort;
 
-    @Value("${zookeeper.address}")
+//    @Value("${zookeeper.address}")
     String zkAddress;
 
     private final List<URL> urlList = new ArrayList<>();
@@ -55,12 +56,18 @@ public class RpcServer implements ApplicationContextAware {
     /**
      * 容器启动时,扫描容器内被@RpcService标注的服务。
      * @param ctx 容器上下文
-     * @throws BeansException 异常
      */
     @Override
     public void setApplicationContext(ApplicationContext ctx) throws BeansException {
-        log.info("zkRegistry String: {}", zkAddress + ":" + zkPort);
-        zkRegistry.initZkRegistry(zkAddress + ":" + zkPort);
+        String ipAddress;
+        try{
+            InetAddress localHost = InetAddress.getLocalHost();
+             ipAddress = localHost.getHostAddress();
+        }catch (Exception e){
+            throw new RuntimeException(e);
+        }
+        log.info("zkRegistry String: {}", ipAddress + ":" + zkPort);
+        zkRegistry.initZkRegistry(ipAddress + ":" + zkPort);
         Map<String, Object> serviceMap = ctx.getBeansWithAnnotation(RpcService.class);
         if (MapUtil.isEmpty(serviceMap)) {
             log.warn("no service found!");

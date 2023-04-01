@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.net.InetAddress;
 import java.util.concurrent.TimeUnit;
 
 
@@ -34,7 +35,7 @@ public class NettyServer implements Server, Runnable {
     @Value("${netty.port}")
     int serverPort;
 
-    @Value("${server.address}")
+
     String serverAddress;
 
 
@@ -71,8 +72,12 @@ public class NettyServer implements Server, Runnable {
                             pipeline.addLast(serviceHandlerGroup, new RpcServerHandler());
                         }
                     });
-            ChannelFuture future = bootstrap.bind(serverAddress, serverPort).sync();
-            log.info("Server started on port：{}", serverPort);
+
+            InetAddress localHost = InetAddress.getLocalHost();
+            String ipAddress = localHost.getHostAddress();
+
+            ChannelFuture future = bootstrap.bind(ipAddress, serverPort).sync();
+            log.info("Server started on adrress:port：{},{}",ipAddress ,serverPort);
             future.channel().closeFuture().sync();
             System.out.println("netty 服务器启动成功!");
         } catch (Exception ex) {

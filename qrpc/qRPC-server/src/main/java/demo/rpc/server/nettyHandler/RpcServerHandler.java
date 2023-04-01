@@ -4,6 +4,7 @@ import demo.rpc.common.constant.MessageType;
 import demo.rpc.common.protocol.RpcMessage;
 import demo.rpc.common.protocol.RpcRequest;
 import demo.rpc.common.protocol.RpcResponse;
+import demo.rpc.server.component.MyMetrics;
 import demo.rpc.server.server.RpcServiceCache;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -38,16 +39,23 @@ public class RpcServerHandler extends SimpleChannelInboundHandler<RpcMessage> {
             //获取请求体
             RpcRequest request = (RpcRequest) rpcMessage.getData();
             Object result = new Object();
+            long startTime = System.nanoTime();
             try {
                 /**
                  * 通过反射调用本地方法
                  */
                 Object service = RpcServiceCache.getService(request.getRpcServiceForCache());
                 Method method = service.getClass().getMethod(request.getMethodName(), request.getParamsTypes());
+                String methodName = method.getName();
                 result = method.invoke(service, request.getParams());
+                MyMetrics.rpcRequests.labels(methodName, "success").inc();
                 log.info("service:[{}] successfully invoke method:[{}]. Result is :{}", request.getInterfaceName(), request.getMethodName(), result);
             } catch (Exception e) {
-                e.printStackTrace();
+                MyMetrics.rpcRequests.labels(request.getMethodName(), "fail").inc();
+                throw e;
+            }finally {
+                long endTime = System.nanoTime();
+                MyMetrics.rpcRequestLatency.labels(request.getMethodName()).observe((endTime - startTime) / 1e9);
             }
             /**
              * 构建响应并返回给客户端。

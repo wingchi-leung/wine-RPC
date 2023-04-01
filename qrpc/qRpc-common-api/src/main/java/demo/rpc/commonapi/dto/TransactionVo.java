@@ -14,4 +14,5 @@ public class TransactionVo {
     private String toAccountName;
     private BigDecimal amount;
     private LocalDateTime createTime;
+    private TransactionType transactionType;
 }

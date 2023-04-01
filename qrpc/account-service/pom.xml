@@ -23,6 +23,11 @@
         </dependency>
         <dependency>
             <groupId>com.wingchi</groupId>
+            <artifactId>qRpc-client</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.wingchi</groupId>
             <artifactId>qRpc-common-api</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>

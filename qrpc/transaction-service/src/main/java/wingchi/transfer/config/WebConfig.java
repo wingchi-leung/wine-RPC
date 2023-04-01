@@ -1,4 +1,4 @@
-package wingchi.account.config;
+package wingchi.transfer.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

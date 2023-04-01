@@ -11,7 +11,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @MapperScan("wingchi.account.mapper")
-@SpringBootApplication(scanBasePackages = {"wingchi.*","demo.rpc.common","demo.rpc.server"})
+@SpringBootApplication(scanBasePackages = {"wingchi.*","demo.rpc","demo.rpc.server"})
 @PropertySource(value={"classpath:application-zookeeper.properties","classpath:application.yml"})
 public class AccountApplication {
 
