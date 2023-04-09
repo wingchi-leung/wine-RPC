@@ -20,7 +20,7 @@ public interface AccountService {
 
     void deleteAccount(Long accountId);
 
-    void deposit(Long accountId, BigDecimal amount);
+    void deposit(AccountVo accountVo);
 
-    void withdraw(Long accountId, BigDecimal amount);
+    void withdraw(AccountVo accountVo);
 }

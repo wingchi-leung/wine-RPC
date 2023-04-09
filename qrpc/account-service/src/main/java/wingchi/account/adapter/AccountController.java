@@ -46,12 +46,13 @@ public class AccountController {
 
     @PostMapping("/deposit")
     public void deposit(@RequestBody AccountVo accountVo) {
-        accountService.deposit(accountVo.getAccountId(), accountVo.getAmount());
+
+        accountService.deposit(accountVo);
     }
 
 
     @PostMapping("/withdraw")
     public void withdraw(@RequestBody AccountVo accountVo) {
-        accountService.withdraw(accountVo.getAccountId(), accountVo.getAmount());
+        accountService.withdraw(accountVo);
     }
 }

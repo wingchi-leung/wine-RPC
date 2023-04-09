@@ -68,12 +68,13 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, AccountDo> im
     }
 
     @Override
-    public void deposit(Long accountId, BigDecimal amount) {
-        addBalance(accountId,amount);
+    public void deposit(AccountVo accountVo) {
+        addBalance(accountVo.getAccountId(),accountVo.getAmount());
         TransactionDto transactionDto = new TransactionDto();
-        transactionDto.setFromAccountId(accountId);
-        transactionDto.setAmount(amount);
+        transactionDto.setFromAccountId(accountVo.getAccountId());
+        transactionDto.setAmount(accountVo.getAmount());
         transactionDto.setTransactionType(TransactionType.DEPOSIT);
+        transactionDto.setFromAccountName(accountVo.getFullName());
         transactionService.createTransaction(transactionDto);
     }
 
@@ -98,11 +99,11 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, AccountDo> im
 
 
     @Override
-    public void withdraw(Long accountId, BigDecimal amount) {
-        deductBalance(accountId,amount);
+    public void withdraw(AccountVo accountVo) {
+        deductBalance(accountVo.getAccountId(),accountVo.getAmount());
         TransactionDto transactionDto = new TransactionDto();
-        transactionDto.setToAccountId(accountId);
-        transactionDto.setAmount(amount);
+        transactionDto.setToAccountId(accountVo.getToAccountId());
+        transactionDto.setAmount(accountVo.getAmount());
         transactionDto.setTransactionType(TransactionType.WITHDRAW);
         transactionService.createTransaction(transactionDto);
     }
