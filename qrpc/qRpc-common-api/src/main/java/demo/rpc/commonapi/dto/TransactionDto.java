@@ -9,5 +9,7 @@ public class TransactionDto {
     private BigDecimal amount;
     private Long fromAccountId;
     private Long toAccountId;
+    private String fromAccountName;
+    private String toAccountName;
     private TransactionType transactionType;
 }

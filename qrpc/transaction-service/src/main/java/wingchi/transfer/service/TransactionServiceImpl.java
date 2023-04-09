@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import wingchi.transfer.entity.TransactionDo;
 import wingchi.transfer.mapper.TransactionMapper;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,13 +29,15 @@ public class TransactionServiceImpl  extends ServiceImpl<TransactionMapper, Tran
     }
 
     public static TransactionVo fromDo(TransactionDo transactionDo) {
+        DateTimeFormatter dtf2 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         TransactionVo transactionVo = new TransactionVo();
         transactionVo.setFromAccountId(transactionDo.getFromAccountId());
         transactionVo.setToAccountId(transactionDo.getToAccountId());
-//        transactionVo.setFromAccountName(transactionDo.getFromAccountName());
-//        transactionVo.setToAccountName(transactionDo.getToAccountName());
+        transactionVo.setFromAccountName(transactionDo.getFromAccountName());
+        transactionVo.setToAccountName(transactionDo.getToAccountName());
         transactionVo.setAmount(transactionDo.getAmount());
-        transactionVo.setCreateTime(transactionDo.getAddTime());
+        transactionVo.setCreateTime(dtf2.format(transactionDo.getAddTime()));
+        transactionVo.setTransactionType(transactionDo.getTransactionType());
         return transactionVo;
     }
 

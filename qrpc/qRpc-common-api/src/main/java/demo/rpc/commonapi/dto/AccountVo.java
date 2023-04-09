@@ -7,6 +7,7 @@ import java.util.List;
 
 @Data
 public class AccountVo {
+    private Long userId;
     private Long accountId;
     private Long toAccountId;
     private String fullName;

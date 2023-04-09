@@ -17,6 +17,8 @@ public class AccountDo {
     @TableId(type = IdType.AUTO)
     private Long accountId;
 
+    private Long userId;
+
     private String fullName;
 
     private BigDecimal balance;

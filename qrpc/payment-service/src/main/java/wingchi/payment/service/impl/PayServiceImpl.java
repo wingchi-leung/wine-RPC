@@ -26,6 +26,7 @@ public class PayServiceImpl extends ServiceImpl<PayMapper, PaymentDo> implements
     @Override
     @Transactional
     public void pay(PaymentDto paymentDto) {
+
         accountService.addBalance(paymentDto.getPayeeId(), paymentDto.getAmount());
         accountService.deductBalance(paymentDto.getPayerId(), paymentDto.getAmount());
         PaymentDo paymentDo = paymentDto.toDo();
@@ -39,6 +40,8 @@ public class PayServiceImpl extends ServiceImpl<PayMapper, PaymentDo> implements
         transactionDto.setFromAccountId(paymentDto.getPayerId());
         transactionDto.setToAccountId(paymentDto.getPayeeId());
         transactionDto.setAmount(paymentDto.getAmount());
+        transactionDto.setFromAccountName(paymentDto.getPayerName());
+        transactionDto.setToAccountName(paymentDto.getPayeeName());
         transactionService.createTransaction(transactionDto);
     }
 }

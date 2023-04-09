@@ -38,8 +38,8 @@ public class AccountController {
     }
 
     @GetMapping("/accountList")
-    public List<AccountVo> getAccountList() {
-        return accountService.getAccountList();
+    public List<AccountVo> getAccountList(@RequestParam(required = false) Long userId) {
+        return accountService.getAccountList(userId);
     }
 
 
@@ -54,7 +54,4 @@ public class AccountController {
     public void withdraw(@RequestBody AccountVo accountVo) {
         accountService.withdraw(accountVo.getAccountId(), accountVo.getAmount());
     }
-
-
-
 }

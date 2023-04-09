@@ -4,20 +4,39 @@ import demo.rpc.common.constant.MessageType;
 import demo.rpc.common.protocol.RpcMessage;
 import demo.rpc.common.protocol.RpcRequest;
 import demo.rpc.common.protocol.RpcResponse;
-import demo.rpc.server.component.MyMetrics;
 import demo.rpc.server.server.RpcServiceCache;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.lang.reflect.Method;
 
 @Slf4j
+@Component
+@ChannelHandler.Sharable
 public class RpcServerHandler extends SimpleChannelInboundHandler<RpcMessage> {
+
+    @Autowired
+    private MeterRegistry registry;
+
+    private Counter rpcRequestSuccess;
+    private Counter rpcRequestFails;
+
+    @PostConstruct
+    public void init() {
+        rpcRequestSuccess=registry.counter("rpc_requests_total", "method", "success");
+        rpcRequestFails=registry.counter("rpc_requests_total", "method", "fails");
+    }
 
     /**
      * 操作：
@@ -48,14 +67,13 @@ public class RpcServerHandler extends SimpleChannelInboundHandler<RpcMessage> {
                 Method method = service.getClass().getMethod(request.getMethodName(), request.getParamsTypes());
                 String methodName = method.getName();
                 result = method.invoke(service, request.getParams());
-                MyMetrics.rpcRequests.labels(methodName, "success").inc();
                 log.info("service:[{}] successfully invoke method:[{}]. Result is :{}", request.getInterfaceName(), request.getMethodName(), result);
+                rpcRequestSuccess.increment();
             } catch (Exception e) {
-                MyMetrics.rpcRequests.labels(request.getMethodName(), "fail").inc();
+                rpcRequestFails.increment();
                 throw e;
-            }finally {
+            } finally {
                 long endTime = System.nanoTime();
-                MyMetrics.rpcRequestLatency.labels(request.getMethodName()).observe((endTime - startTime) / 1e9);
             }
             /**
              * 构建响应并返回给客户端。

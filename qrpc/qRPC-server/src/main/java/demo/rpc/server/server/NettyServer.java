@@ -8,10 +8,7 @@ import demo.rpc.common.netty.RpcMessageEncoder;
 import demo.rpc.server.nettyHandler.RpcServerHandler;
 import demo.rpc.server.registry.ZkRegistry;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -42,6 +39,9 @@ public class NettyServer implements Server, Runnable {
     @Autowired
     private ZkRegistry zkRegistry;
 
+    @Autowired
+    private RpcServerHandler rpcServerHandler;
+
 
     /**
      * 启动netty服务器
@@ -69,7 +69,7 @@ public class NettyServer implements Server, Runnable {
                             pipeline.addLast(new IdleStateHandler(30, 0, 0, TimeUnit.SECONDS));
                             pipeline.addLast(new RpcMessageEncoder());
                             pipeline.addLast(new RpcMessageDecoder());
-                            pipeline.addLast(serviceHandlerGroup, new RpcServerHandler());
+                            pipeline.addLast(serviceHandlerGroup, rpcServerHandler);
                         }
                     });
 

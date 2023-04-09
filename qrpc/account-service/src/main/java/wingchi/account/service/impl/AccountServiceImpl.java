@@ -9,10 +9,12 @@ import demo.rpc.commonapi.dto.TransactionDto;
 import demo.rpc.commonapi.dto.TransactionType;
 import demo.rpc.commonapi.service.AccountService;
 import demo.rpc.commonapi.service.TransactionService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import wingchi.account.component.AccountStatus;
 import wingchi.account.entity.AccountDo;
+import wingchi.account.entity.UserDo;
 import wingchi.account.mapper.AccountMapper;
 
 import java.math.BigDecimal;
@@ -26,6 +28,10 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, AccountDo> im
 
     @RpcAutowire(version="1.0")
     private TransactionService transactionService;
+
+    @Autowired
+    private UserServiceImpl userService;
+
 
     public AccountVo getAccount(Long accountId) {
         AccountDo account = this.getById(accountId);
@@ -42,6 +48,7 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, AccountDo> im
         accountDo.setPassword(accountVo.getPassword());
         accountDo.setStatus(AccountStatus.INUSE);
         accountDo.setPhone(accountVo.getPhone());
+        accountDo.setUserId(accountVo.getUserId());
         this.save(accountDo);
     }
 
@@ -78,9 +85,13 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, AccountDo> im
         account.setBalance(account.getBalance().subtract(amount));
         this.updateById(account);
     }
+
     @Transactional
     public void addBalance(Long accountId, BigDecimal amount) {
         AccountDo account = this.getById(accountId);
+        if(account==null){
+            throw new RuntimeException("客户不存在！");
+        }
         account.setBalance(account.getBalance().add(amount));
         this.updateById(account);
     }
@@ -98,9 +109,16 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, AccountDo> im
 
 
 
-    public List<AccountVo> getAccountList() {
+    public List<AccountVo> getAccountList(Long userId) {
+        UserDo userDo = null;
+        if(userId != null) {
+            userDo =userService.getById(userId);
+        }
         LambdaQueryWrapper<AccountDo> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(AccountDo::getStatus, AccountStatus.INUSE.name());
+        if(userDo != null) {
+            queryWrapper.eq(AccountDo::getUserId, userId);
+        }
         List<AccountDo> accountDos = baseMapper.selectList(queryWrapper);
         return accountDos.stream().map(AccountServiceImpl::fromDo).collect(Collectors.toList());
     }
@@ -113,7 +131,7 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, AccountDo> im
         accountVo.setEmail(account.getEmail());
         accountVo.setNumber(account.getNumber());
         accountVo.setPassword(account.getPassword());
-        accountVo.setIsAdmin(Boolean.TRUE);
+        accountVo.setIsAdmin(Boolean.FALSE);
         accountVo.setPhone(account.getPhone());
         accountVo.setTransactions(new ArrayList<>()); ;
         accountVo.setAmount(BigDecimal.ZERO);

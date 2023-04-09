@@ -10,7 +10,7 @@ public interface AccountService {
 
      void deductBalance(Long accountId, BigDecimal amount);
 
-    List<AccountVo> getAccountList();
+    List<AccountVo> getAccountList(Long userId);
 
     AccountVo getAccount(Long accountId);
 

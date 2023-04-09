@@ -17,6 +17,8 @@ public class TransactionDo {
     private Long id;
     private Long fromAccountId;
     private Long toAccountId;
+    private String fromAccountName;
+    private String toAccountName;
     private BigDecimal amount;
     private LocalDateTime addTime;
     private LocalDateTime updateTime;
@@ -28,6 +30,8 @@ public class TransactionDo {
         transactionDo.setFromAccountId(createDto.getFromAccountId());
         transactionDo.setToAccountId(createDto.getToAccountId());
         transactionDo.setTransactionType(createDto.getTransactionType());
+        transactionDo.setFromAccountName(createDto.getFromAccountName());
+        transactionDo.setToAccountName(createDto.getToAccountName());
         return transactionDo;
 
     }

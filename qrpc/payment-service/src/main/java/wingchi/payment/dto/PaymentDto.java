@@ -13,6 +13,10 @@ public class PaymentDto {
 
     private Long payerId;
 
+    private String payeeName;
+
+    private String payerName;
+
     private BigDecimal amount;
 
     private PayChannel payChannel;
