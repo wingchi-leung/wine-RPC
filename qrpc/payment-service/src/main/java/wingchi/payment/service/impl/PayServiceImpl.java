@@ -13,6 +13,9 @@ import wingchi.payment.entity.PaymentDo;
 import wingchi.payment.mapper.PayMapper;
 import wingchi.payment.service.PayService;
 
+import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
+
 @Service
 public class PayServiceImpl extends ServiceImpl<PayMapper, PaymentDo> implements PayService {
 
@@ -26,12 +29,25 @@ public class PayServiceImpl extends ServiceImpl<PayMapper, PaymentDo> implements
     @Override
     @Transactional
     public void pay(PaymentDto paymentDto) {
+        try{
+            if(paymentDto.getAmount().equals(BigDecimal.ZERO)){
+                return;
+            }
+            accountService.addBalance(paymentDto.getPayeeId(), paymentDto.getAmount());
+            accountService.deductBalance(paymentDto.getPayerId(), paymentDto.getAmount());
+            PaymentDo paymentDo = paymentDto.toDo();
+            saveTransaction(paymentDto);
+            save(paymentDo);
+        }catch (Exception e){
+            if(e instanceof InvocationTargetException){
+                String message = ((InvocationTargetException) e).getTargetException().getMessage();
+                throw new RuntimeException(message,e);
+            }
+            else {
+                throw new RuntimeException(e);
+            }
 
-        accountService.addBalance(paymentDto.getPayeeId(), paymentDto.getAmount());
-        accountService.deductBalance(paymentDto.getPayerId(), paymentDto.getAmount());
-        PaymentDo paymentDo = paymentDto.toDo();
-        saveTransaction(paymentDto);
-        save(paymentDo);
+        }
     }
 
     private void saveTransaction(PaymentDto paymentDto) {
@@ -42,6 +58,8 @@ public class PayServiceImpl extends ServiceImpl<PayMapper, PaymentDo> implements
         transactionDto.setAmount(paymentDto.getAmount());
         transactionDto.setFromAccountName(paymentDto.getPayerName());
         transactionDto.setToAccountName(paymentDto.getPayeeName());
+        //资金流出的卡号
+        transactionDto.setCardNo(paymentDto.getPayerNo());
         transactionService.createTransaction(transactionDto);
     }
 }

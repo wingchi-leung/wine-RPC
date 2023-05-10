@@ -7,6 +7,7 @@ import demo.rpc.common.protocol.RpcResponse;
 import demo.rpc.server.server.RpcServiceCache;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -20,22 +21,37 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.lang.reflect.Method;
+import java.util.concurrent.*;
 
 @Slf4j
 @Component
 @ChannelHandler.Sharable
 public class RpcServerHandler extends SimpleChannelInboundHandler<RpcMessage> {
 
+
+    private static final int MAX_TOKENS = 10;
+    private static final int REFILL_INTERVAL = 1000 / MAX_TOKENS;
+    private final BlockingQueue<Integer> tokensQueue = new LinkedBlockingQueue<>(MAX_TOKENS);
+    private final ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
     @Autowired
     private MeterRegistry registry;
 
     private Counter rpcRequestSuccess;
     private Counter rpcRequestFails;
+    private Timer timer;
+    private Counter errors;
 
     @PostConstruct
     public void init() {
-        rpcRequestSuccess=registry.counter("rpc_requests_total", "method", "success");
-        rpcRequestFails=registry.counter("rpc_requests_total", "method", "fails");
+        rpcRequestSuccess = registry.counter("rpc_requests_total", "method", "success");
+        rpcRequestFails = registry.counter("rpc_requests_total", "method", "fails");
+        errors = registry.counter("request_error_rate", "method", "error");
+        timer = registry.timer("process_time", "method", "time");
+
+        scheduler.scheduleAtFixedRate(() -> {
+            tokensQueue.offer(1);
+        }, 0, REFILL_INTERVAL, TimeUnit.MILLISECONDS);
+
     }
 
     /**
@@ -55,9 +71,11 @@ public class RpcServerHandler extends SimpleChannelInboundHandler<RpcMessage> {
         try {
             if (rpcMessage.getMessageType() != MessageType.REQUEST.getValue())
                 return;
+            //如果队列为空则阻塞等待
+            tokensQueue.take();
             //获取请求体
             RpcRequest request = (RpcRequest) rpcMessage.getData();
-            Object result = new Object();
+            Object result;
             long startTime = System.nanoTime();
             try {
                 /**
@@ -65,15 +83,16 @@ public class RpcServerHandler extends SimpleChannelInboundHandler<RpcMessage> {
                  */
                 Object service = RpcServiceCache.getService(request.getRpcServiceForCache());
                 Method method = service.getClass().getMethod(request.getMethodName(), request.getParamsTypes());
-                String methodName = method.getName();
                 result = method.invoke(service, request.getParams());
                 log.info("service:[{}] successfully invoke method:[{}]. Result is :{}", request.getInterfaceName(), request.getMethodName(), result);
                 rpcRequestSuccess.increment();
             } catch (Exception e) {
                 rpcRequestFails.increment();
-                throw e;
+                result = e;
             } finally {
                 long endTime = System.nanoTime();
+                timer.record(endTime - startTime, TimeUnit.NANOSECONDS);
+                getErrorRate();
             }
             /**
              * 构建响应并返回给客户端。
@@ -88,13 +107,24 @@ public class RpcServerHandler extends SimpleChannelInboundHandler<RpcMessage> {
                 rpcMessageBuilder.data(response);
             } else {
                 rpcMessageBuilder.data(RpcResponse.fail());
-                log.error("not writable not, message droped!");
+                log.error("channel can‘t write, message dropped!");
             }
-            //LEARN
             ctx.writeAndFlush(rpcMessageBuilder.build()).addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
-        } finally {
-
+        } catch (Exception e){
+            throw e;
+        }
+        finally{
             ReferenceCountUtil.release(rpcMessage);
+        }
+    }
+
+    private void getErrorRate() {
+        Double total = rpcRequestFails.count() + rpcRequestSuccess.count();
+        if (total.equals(new Double(0))) {
+            errors.increment(0.0);
+        } else {
+            double errorRate = rpcRequestFails.count() / total;
+            errors.increment(errorRate);
         }
     }
 

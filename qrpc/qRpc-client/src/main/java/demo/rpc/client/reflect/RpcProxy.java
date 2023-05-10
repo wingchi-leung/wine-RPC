@@ -44,6 +44,10 @@ public class RpcProxy<T> implements InvocationHandler {
         // getData方法实际上是调用Completable的get方法,此方法阻塞。
         Object data = ((RpcResponse<?>) rpcResult.getData()).getData();
         log.info("get RpcResponse Data = {}", data);
+        if(data instanceof Exception){
+            Exception e = (Exception) data;
+            throw e;
+        }
         return data;
     }
 

@@ -23,6 +23,7 @@ public class TransactionDo {
     private LocalDateTime addTime;
     private LocalDateTime updateTime;
     private TransactionType transactionType;
+    private BigDecimal accountNo;
 
     public static TransactionDo fromCreateDto(TransactionDto createDto){
         TransactionDo transactionDo = new TransactionDo();
@@ -32,6 +33,7 @@ public class TransactionDo {
         transactionDo.setTransactionType(createDto.getTransactionType());
         transactionDo.setFromAccountName(createDto.getFromAccountName());
         transactionDo.setToAccountName(createDto.getToAccountName());
+        transactionDo.setAccountNo(createDto.getCardNo());
         return transactionDo;
 
     }

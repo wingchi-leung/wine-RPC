@@ -8,9 +8,11 @@ import demo.rpc.common.zookeeper.CuratorClient;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 import static demo.rpc.common.constant.RegistryConstant.PROVIDERS;
 import static demo.rpc.common.constant.RegistryConstant.ROOT_PATH;
@@ -54,11 +56,11 @@ public class ZkDiscovery implements Discovery {
     public List<URL> discover(URL url) {
         String serviceName = url.getInterfaceName();
         List<URL> urls = null;
-        if (urlCache.containsKey(serviceName)) {
-            urls = urlCache.get(serviceName).stream().map(URL::valueOf).collect(Collectors.toList());
-        }else{
+//        if (urlCache.containsKey(serviceName)) {
+//            urls = urlCache.get(serviceName).stream().map(URL::valueOf).collect(Collectors.toList());
+//        }else{
             urls = reset(url);
-        }
+//        }
         log.info("Zk discover url : {}",urls) ;
         return urls;
     }

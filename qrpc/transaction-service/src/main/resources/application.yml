@@ -8,6 +8,9 @@ spring:
     password: ss123000
   aop:
     proxy-target-class: true
+  devtools:
+    restart:
+      enabled: false
 management:
   endpoints:
     web:
@@ -18,9 +21,8 @@ management:
     tags: # 通用标签
       application: ${spring.application.name}
 mybatis-plus:
-  configuration:
-    map-underscore-to-camel-case: true
+  config-location: classpath:mybatis-config.xml
 server:
-  port: 10098
+  port: 10078
 netty:
-  port: 10088
+  port: 10079

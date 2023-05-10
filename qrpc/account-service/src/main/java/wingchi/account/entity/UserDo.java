@@ -14,7 +14,7 @@ public class UserDo
     private String phone;
     private String address;
     private String status;
-    private String role;
+
     private String addTime;
-    private String updatedTime;
+    private String updateTime;
 }

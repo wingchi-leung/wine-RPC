@@ -1,5 +1,14 @@
 package demo.rpc.client.reflect;
 
+import demo.rpc.client.compoment.PrometheusMetric;
+import demo.rpc.client.compoment.SpringBeanContext;
+import demo.rpc.client.discovery.ZkDiscovery;
+import demo.rpc.client.dto.AsyncResult;
+import demo.rpc.client.dto.RpcResult;
+import demo.rpc.client.loadbalance.LoadBalance;
+import demo.rpc.client.loadbalance.RoundRobin;
+import demo.rpc.client.netty.NettyClient;
+import demo.rpc.client.netty.UnProcessMessage;
 import demo.rpc.common.constant.CompressType;
 import demo.rpc.common.constant.MessageType;
 import demo.rpc.common.constant.ProtocolConstants;
@@ -9,22 +18,16 @@ import demo.rpc.common.protocol.RpcRequest;
 import demo.rpc.common.protocol.RpcResponse;
 import demo.rpc.common.registry.Discovery;
 import demo.rpc.common.registry.URL;
-import demo.rpc.client.discovery.ZkDiscovery;
-import demo.rpc.client.dto.AsyncResult;
-import demo.rpc.client.dto.RpcResult;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
-import demo.rpc.client.loadbalance.LoadBalance;
-import demo.rpc.client.loadbalance.RoundRobin;
 import lombok.extern.slf4j.Slf4j;
-import demo.rpc.client.netty.NettyClient;
-import demo.rpc.client.netty.UnProcessMessage;
 
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Slf4j
+
 public class NettyInvoker {
     private final LoadBalance loadBalance = new RoundRobin();
 
@@ -39,13 +42,28 @@ public class NettyInvoker {
      * @return
      */
     public RpcResult invoke(RpcRequest request) {
+        int retry = 0;
         //构建URL信息
         URL url = URL.builder().interfaceName(request.getInterfaceName())
                 .version(request.getVersion()).build();
         //查找注册中心中符合的服务
         List<URL> urlList = discovery.discover(url);
         URL select = loadBalance.select(urlList, request);
-        return doInvoke(request, select);
+        PrometheusMetric prometheusMetric = SpringBeanContext.getContext().getBean(PrometheusMetric.class);
+        while(retry<3){
+            try {
+                return doInvoke(request, select);
+            } catch (Exception e) {
+                log.error("invoke error:{}", e.getMessage());
+                retry++;
+                log.warn("超时重试retry:{}", retry);
+                if(retry>1){
+                    prometheusMetric.getRpcRetryCounter().increment();
+                }
+            }
+        }
+        throw new RuntimeException("发生未知错误！");
+
     }
 
     private RpcResult doInvoke(RpcRequest request, URL select) {

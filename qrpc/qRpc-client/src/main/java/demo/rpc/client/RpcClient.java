@@ -18,8 +18,6 @@ import java.lang.reflect.Field;
 @Slf4j
 @Component
 public class RpcClient implements ApplicationContextAware, DisposableBean {
-
-
     private final ZkDiscovery zkDiscovery;
 
     public RpcClient() {
@@ -34,10 +32,9 @@ public class RpcClient implements ApplicationContextAware, DisposableBean {
     @Override
     public void setApplicationContext(ApplicationContext ctx) throws BeansException {
         String[] beanNames = ctx.getBeanDefinitionNames();
-
         //查找所有bean,找出字段中定义有注解的
         for (String beanName : beanNames) {
-            //简单处理循环依赖的问题。
+            //处理循环依赖
             if (beanName.equals("rpcClient")) continue;
             Object bean = ctx.getBean(beanName);
             if (AopUtils.isAopProxy(bean)) {

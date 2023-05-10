@@ -55,7 +55,6 @@ public class ZkRegistry implements Registry {
                     .addListener(new SessionConnectionListener(addressPath, address));
             log.info("创建地址节点:{}", path);
             pathList.add(path);
-
         }
     }
 

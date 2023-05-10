@@ -12,5 +12,7 @@ public class TransactionVo {
     private String toAccountName;
     private BigDecimal amount;
     private String createTime;
-    private TransactionType transactionType;
+    private String type;
+    private String cardNo;
+    private Long totalPages;
 }

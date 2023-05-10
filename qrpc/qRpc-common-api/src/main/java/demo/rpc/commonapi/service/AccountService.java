@@ -8,7 +8,7 @@ import java.util.List;
 public interface AccountService {
      void addBalance(Long accountId, BigDecimal amount);
 
-     void deductBalance(Long accountId, BigDecimal amount);
+     void deductBalance(Long accountId, BigDecimal amount) throws Exception;
 
     List<AccountVo> getAccountList(Long userId);
 
@@ -22,5 +22,7 @@ public interface AccountService {
 
     void deposit(AccountVo accountVo);
 
-    void withdraw(AccountVo accountVo);
+    void withdraw(AccountVo accountVo) throws Exception;
+
+    List<AccountVo> login(AccountVo accountVo);
 }

@@ -12,4 +12,5 @@ public class TransactionDto {
     private String fromAccountName;
     private String toAccountName;
     private TransactionType transactionType;
+    private BigDecimal cardNo;
 }

@@ -75,6 +75,7 @@ public class RpcServer implements ApplicationContextAware {
         }
         //https://blog.csdn.net/ypp91zr/article/details/103730870
         for (Object service : serviceMap.values()) {
+            //获取原始对象
             Class<?> target = AopProxyUtils.ultimateTargetClass(service);
             RpcService rpcService = target.getAnnotation(RpcService.class);
             log.info("接口名称 interface={}", rpcService.value().getName());

@@ -32,10 +32,6 @@ public class NettyServer implements Server, Runnable {
     @Value("${netty.port}")
     int serverPort;
 
-
-    String serverAddress;
-
-
     @Autowired
     private ZkRegistry zkRegistry;
 
@@ -84,7 +80,7 @@ public class NettyServer implements Server, Runnable {
             if (ex instanceof InterruptedException) {
                 log.error("server InterruptedException");
             } else {
-                log.error("server error !! {}", ex.getMessage());
+                log.error("server error !! {},port: {}", ex.getMessage(),serverPort);
             }
         } finally {
             try {

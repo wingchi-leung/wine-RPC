@@ -37,9 +37,9 @@ public class AccountController {
         accountService.deleteAccount(accountId);
     }
 
-    @GetMapping("/accountList")
-    public List<AccountVo> getAccountList(@RequestParam(required = false) Long userId) {
-        return accountService.getAccountList(userId);
+    @PostMapping("/accountList")
+    public List<AccountVo> getAccountList(@RequestBody AccountVo accountVo) {
+        return accountService.getAccountList(accountVo.getUserId());
     }
 
 
@@ -52,7 +52,7 @@ public class AccountController {
 
 
     @PostMapping("/withdraw")
-    public void withdraw(@RequestBody AccountVo accountVo) {
+    public void withdraw(@RequestBody AccountVo accountVo) throws Exception {
         accountService.withdraw(accountVo);
     }
 }

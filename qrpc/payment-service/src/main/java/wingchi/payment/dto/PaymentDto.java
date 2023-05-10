@@ -17,6 +17,10 @@ public class PaymentDto {
 
     private String payerName;
 
+    private BigDecimal payeeNo;
+
+    private BigDecimal payerNo;
+
     private BigDecimal amount;
 
     private PayChannel payChannel;

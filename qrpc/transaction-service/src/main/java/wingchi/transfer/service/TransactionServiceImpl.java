@@ -1,11 +1,16 @@
 package wingchi.transfer.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import demo.rpc.common.annotation.RpcService;
 import demo.rpc.commonapi.dto.TransactionDto;
 import demo.rpc.commonapi.dto.TransactionVo;
 import demo.rpc.commonapi.service.TransactionService;
 import org.springframework.stereotype.Service;
+import wingchi.transfer.dto.ResultData;
+import wingchi.transfer.dto.TransactionQuery;
 import wingchi.transfer.entity.TransactionDo;
 import wingchi.transfer.mapper.TransactionMapper;
 
@@ -16,10 +21,16 @@ import java.util.stream.Collectors;
 @Service
 @RpcService(value = TransactionService.class, version = "1.0")
 public class TransactionServiceImpl  extends ServiceImpl<TransactionMapper, TransactionDo> implements TransactionService {
-    @Override
-    public List<TransactionVo> getTransactionList() {
-        List<TransactionDo> list = list();
-        return list.stream().map(TransactionServiceImpl::fromDo).collect(Collectors.toList());
+
+    public ResultData<List<TransactionVo>> getTransactionList(TransactionQuery query) {
+        PageHelper.startPage(query.getPage(), 10);
+
+        LambdaQueryWrapper<TransactionDo> wrapper=new LambdaQueryWrapper<>();
+        List<TransactionDo> list = getBaseMapper().selectList(wrapper);
+        PageInfo<TransactionDo> pageInfo = new PageInfo(list);
+
+        return ResultData.success(pageInfo.getList().stream().map(x->fromDo(x)).collect(Collectors.toList()),
+                pageInfo.getPages(), pageInfo.getTotal());
     }
 
     @Override
@@ -35,9 +46,10 @@ public class TransactionServiceImpl  extends ServiceImpl<TransactionMapper, Tran
         transactionVo.setToAccountId(transactionDo.getToAccountId());
         transactionVo.setFromAccountName(transactionDo.getFromAccountName());
         transactionVo.setToAccountName(transactionDo.getToAccountName());
-        transactionVo.setAmount(transactionDo.getAmount());
+        transactionVo.setAmount(transactionDo.getTransactionType().formatAmount(transactionDo.getAmount()));
         transactionVo.setCreateTime(dtf2.format(transactionDo.getAddTime()));
-        transactionVo.setTransactionType(transactionDo.getTransactionType());
+        transactionVo.setType(transactionDo.getTransactionType().getName());
+        transactionVo.setCardNo(transactionDo.getAccountNo().toString().substring(4));
         return transactionVo;
     }
 
